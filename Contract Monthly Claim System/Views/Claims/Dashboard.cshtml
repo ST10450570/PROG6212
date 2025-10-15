@@ -1,0 +1,244 @@
+﻿@using System.Security.Claims
+@{
+    ViewData["Title"] = "Dashboard";
+    var userName = ViewBag.UserName ?? "User";
+    var department = ViewBag.Department ?? "N/A";
+    var userRole = ViewBag.UserRole ?? "User";
+
+    // Pre-check roles to avoid lambda expressions in dynamic context
+    var isCoordinatorOrManager = User.IsInRole("Coordinator") || User.IsInRole("Manager");
+    var isAdministrator = User.IsInRole("Administrator");
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 d-md-block bg-dark sidebar collapse">
+            <div class="position-sticky pt-3">
+                <div class="text-center mb-4">
+                    <div class="avatar-circle bg-primary mb-3">
+                        <span class="avatar-initials">
+                            @{
+                                var initials = "";
+                                if (!string.IsNullOrEmpty(userName))
+                                {
+                                    var nameParts = userName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                                    if (nameParts.Length >= 2)
+                                    {
+                                        initials = $"{nameParts[0][0]}{nameParts[1][0]}".ToUpper();
+                                    }
+                                    else if (nameParts.Length == 1 && nameParts[0].Length >= 2)
+                                    {
+                                        initials = nameParts[0].Substring(0, 2).ToUpper();
+                                    }
+                                    else
+                                    {
+                                        initials = "US";
+                                    }
+                                }
+                                else
+                                {
+                                    initials = "US";
+                                }
+                            }
+                            @initials
+                        </span>
+                    </div>
+                    <h6 class="text-white">@userName</h6>
+                    <small class="text-muted">@department</small>
+                    <div class="badge bg-info mt-1">@userRole</div>
+                </div>
+
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active text-white" asp-action="Dashboard" asp-controller="Claims">
+                            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" asp-action="Index" asp-controller="Claims">
+                            <i class="fas fa-file-invoice me-2"></i>My Claims
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" asp-action="Create" asp-controller="Claims">
+                            <i class="fas fa-plus-circle me-2"></i>New Claim
+                        </a>
+                    </li>
+
+                    @if (isCoordinatorOrManager)
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link text-white" asp-action="Pending" asp-controller="Claims">
+                                <i class="fas fa-tasks me-2"></i>Pending Claims
+                            </a>
+                        </li>
+                    }
+
+                    @if (isAdministrator)
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link text-white" asp-area="Identity" asp-page="/Account/Register">
+                                <i class="fas fa-users-cog me-2"></i>User Management
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Dashboard</h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <a asp-action="Create" asp-controller="Claims" class="btn btn-primary">
+                        <i class="fas fa-plus me-1"></i> New Claim
+                    </a>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="row">
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-primary shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                        Total Claims
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800" id="totalClaims">0</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-file-invoice fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-success shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                        Approved
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800" id="approvedClaims">0</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-warning shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                        Pending
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800" id="pendingClaims">0</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-clock fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-info shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                        Total Amount
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800" id="totalAmount">R 0</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-money-bill-wave fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Claims -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card shadow">
+                        <div class="card-header bg-white py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Recent Claims</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive" id="recentClaimsTable">
+                                <p class="text-center text-muted">Loading claims...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            loadDashboardStats();
+            loadRecentClaims();
+        });
+
+        function loadDashboardStats() {
+            $.get('@Url.Action("GetDashboardStats", "Claims")', function (data) {
+                $('#totalClaims').text(data.totalClaims);
+                $('#approvedClaims').text(data.approvedClaims);
+                $('#pendingClaims').text(data.pendingClaims);
+                $('#totalAmount').text('R ' + data.totalAmount.toLocaleString());
+            });
+        }
+
+        function loadRecentClaims() {
+            $.get('@Url.Action("GetRecentClaims", "Claims")', function (data) {
+                // Since GetRecentClaims returns JSON, we need to build the HTML
+                if (data && data.length > 0) {
+                    var html = '<table class="table table-hover">';
+                    html += '<thead><tr><th>Claim Number</th><th>Date</th><th>Amount</th><th>Status</th><th>Period</th></tr></thead>';
+                    html += '<tbody>';
+
+                    data.forEach(function(claim) {
+                        var statusClass = '';
+                        if (claim.status === 'Approved') statusClass = 'text-success';
+                        else if (claim.status === 'Rejected') statusClass = 'text-danger';
+                        else if (claim.status === 'Pending') statusClass = 'text-warning';
+
+                        html += '<tr>';
+                        html += '<td>' + claim.claimNumber + '</td>';
+                        html += '<td>' + new Date(claim.claimDate).toLocaleDateString() + '</td>';
+                        html += '<td>R ' + claim.totalAmount.toLocaleString() + '</td>';
+                        html += '<td class="' + statusClass + '">' + claim.status + '</td>';
+                        html += '<td>' + claim.period + '</td>';
+                        html += '</tr>';
+                    });
+
+                    html += '</tbody></table>';
+                    $('#recentClaimsTable').html(html);
+                } else {
+                    $('#recentClaimsTable').html('<p class="text-center text-muted">No recent claims found.</p>');
+                }
+            }).fail(function() {
+                $('#recentClaimsTable').html('<p class="text-center text-danger">Error loading recent claims.</p>');
+            });
+        }
+    </script>
+}

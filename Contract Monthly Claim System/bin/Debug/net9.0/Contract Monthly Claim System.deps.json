@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v9.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v9.0": {
+      "Contract Monthly Claim System/1.0.0": {
+        "runtime": {
+          "Contract Monthly Claim System.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Contract Monthly Claim System/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

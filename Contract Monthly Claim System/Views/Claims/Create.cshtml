@@ -1,0 +1,103 @@
+﻿@model Contract_Monthly_Claim_System.Models.Claim
+@{
+    ViewData["Title"] = "Submit New Claim";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-plus-circle me-2"></i>Submit New Monthly Claim</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" id="claimForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="PeriodStart" class="form-label">Period Start</label>
+                                <input type="date" class="form-control" asp-for="PeriodStart" />
+                                <span asp-validation-for="PeriodStart" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="PeriodEnd" class="form-label">Period End</label>
+                                <input type="date" class="form-control" asp-for="PeriodEnd" />
+                                <span asp-validation-for="PeriodEnd" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="HoursWorked" class="form-label">Hours Worked</label>
+                                <input type="number" class="form-control" asp-for="HoursWorked" step="0.5" min="1" max="200"
+                                       onchange="calculateTotal()" id="HoursWorked" />
+                                <span class="text-muted small">Enter total hours for the month</span>
+                                <span asp-validation-for="HoursWorked" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="HourlyRate" class="form-label">Hourly Rate (R)</label>
+                                <input type="number" class="form-control" asp-for="HourlyRate" step="0.01" min="100"
+                                       onchange="calculateTotal()" id="HourlyRate" />
+                                <span asp-validation-for="HourlyRate" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Total Amount (R)</label>
+                                <input type="text" class="form-control bg-light" id="totalAmountDisplay" readonly
+                                       value="0.00" />
+                                <input type="hidden" asp-for="TotalAmount" id="TotalAmount" />
+                                <span class="text-muted small">Calculated automatically</span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="WorkDescription" class="form-label">Work Description *</label>
+                            <textarea class="form-control" asp-for="WorkDescription" rows="3"
+                                      placeholder="Describe the work performed during this period..." required></textarea>
+                            <span asp-validation-for="WorkDescription" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Notes" class="form-label">Notes (Optional)</label>
+                            <textarea class="form-control" asp-for="Notes" rows="2"
+                                      placeholder="Add any additional information about this claim..."></textarea>
+                            <span asp-validation-for="Notes" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">Supporting Documents</label>
+                            <div class="border rounded p-3 text-center bg-light">
+                                <i class="fas fa-cloud-upload-alt fa-2x text-muted mb-2"></i>
+                                <p class="text-muted">You can upload supporting documents after creating the claim</p>
+                                <p class="text-muted small">Supported formats: PDF, DOCX, XLSX, JPG, PNG (Max: 10MB)</p>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-paper-plane me-1"></i>Create Claim
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function calculateTotal() {
+            const hours = parseFloat(document.getElementById('HoursWorked').value) || 0;
+            const rate = parseFloat(document.getElementById('HourlyRate').value) || 0;
+            const total = hours * rate;
+            document.getElementById('totalAmountDisplay').value = total.toFixed(2);
+            document.getElementById('TotalAmount').value = total;
+        }
+
+        // Initialize calculation on page load
+        document.addEventListener('DOMContentLoaded', calculateTotal);
+    </script>
+}

@@ -1,0 +1,127 @@
+﻿@model IEnumerable<Contract_Monthly_Claim_System.Models.Claim>
+@{
+    ViewData["Title"] = "My Claims";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-file-invoice me-2"></i>My Claims History</h2>
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="fas fa-plus me-1"></i> Submit New Claim
+        </a>
+    </div>
+
+    <div class="row">
+        <!-- Quick Stats -->
+        <div class="col-md-3 mb-4">
+            <div class="card bg-primary text-white text-center shadow">
+                <div class="card-body">
+                    <h5 class="card-title">@Model.Count()</h5>
+                    <p class="card-text">Total Claims</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card bg-success text-white text-center shadow">
+                <div class="card-body">
+                    <h5 class="card-title">@Model.Count(c => c.Status == "Approved")</h5>
+                    <p class="card-text">Approved</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card bg-warning text-dark text-center shadow">
+                <div class="card-body">
+                    <h5 class="card-title">@Model.Count(c => c.Status == "Submitted" || c.Status == "UnderReview")</h5>
+                    <p class="card-text">Pending Review</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card bg-danger text-white text-center shadow">
+                <div class="card-body">
+                    <h5 class="card-title">@Model.Count(c => c.Status == "Rejected")</h5>
+                    <p class="card-text">Rejected</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Claim History</h5>
+        </div>
+        <div class="card-body">
+            @if (Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Claim Number</th>
+                                <th>Period</th>
+                                <th>Hours</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Submitted</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var claim in Model)
+                            {
+                                <tr>
+                                    <td>@claim.ClaimNumber</td>
+                                    <td>@claim.ClaimPeriod</td>
+                                    <td>@claim.HoursWorked</td>
+                                    <td class="fw-bold">R @claim.TotalAmount.ToString("N2")</td>
+                                    <td>
+                                        @if (claim.Status == "Approved")
+                                        {
+                                            <span class="badge bg-success">@claim.Status</span>
+                                        }
+                                        else if (claim.Status == "Rejected")
+                                        {
+                                            <span class="badge bg-danger">@claim.Status</span>
+                                        }
+                                        else if (claim.Status == "Submitted" || claim.Status == "UnderReview")
+                                        {
+                                            <span class="badge bg-warning">Under Review</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">@claim.Status</span>
+                                        }
+                                    </td>
+                                    <td>@claim.ClaimDate.ToString("dd MMM yyyy")</td>
+                                    <td>
+                                        <a asp-action="Details" asp-route-id="@claim.ClaimId" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i> Details
+                                        </a>
+                                        @if (claim.CanEdit)
+                                        {
+                                            <a asp-action="Edit" asp-route-id="@claim.ClaimId" class="btn btn-sm btn-outline-secondary">
+                                                <i class="fas fa-edit"></i> Edit
+                                            </a>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <i class="fas fa-file-invoice fa-4x text-muted mb-3"></i>
+                    <h4 class="text-muted">No Claims Found</h4>
+                    <p class="text-muted">You haven't submitted any claims yet.</p>
+                    <a asp-action="Create" class="btn btn-primary">
+                        <i class="fas fa-plus me-1"></i> Submit Your First Claim
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>

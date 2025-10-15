@@ -1,0 +1,90 @@
+﻿@{
+    ViewData["Title"] = "Contract Monthly Claim System";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10 text-center">
+            <div class="hero-section">
+                <h1 class="display-4 mb-4">Contract Monthly Claim System</h1>
+                <p class="lead mb-4">Streamlining the claim submission and approval process for Independent Contractor Lecturers</p>
+
+                <div class="row mt-5">
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body text-center">
+                                <i class="fas fa-user-graduate fa-3x text-primary mb-3"></i>
+                                <h5 class="card-title">Lecturer Portal</h5>
+                                <p class="card-text">Submit monthly claims, upload supporting documents, and track claim status</p>
+                                <a asp-controller="Claims" asp-action="Index" class="btn btn-outline-primary">Access Claims</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body text-center">
+                                <i class="fas fa-tasks fa-3x text-success mb-3"></i>
+                                <h5 class="card-title">Coordinator Portal</h5>
+                                <p class="card-text">Review and verify submitted claims from department lecturers</p>
+                                <a asp-controller="Claims" asp-action="Pending" class="btn btn-outline-success">Review Claims</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body text-center">
+                                <i class="fas fa-clipboard-check fa-3x text-info mb-3"></i>
+                                <h5 class="card-title">Manager Portal</h5>
+                                <p class="card-text">Approve claims and manage departmental claim approvals</p>
+                                <a asp-controller="Claims" asp-action="Pending" class="btn btn-outline-info">Manage Approvals</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <div class="mt-5">
+                        <h4>Welcome, @User.Identity.Name!</h4>
+                        <p class="text-muted">You are logged in as: <span class="badge bg-primary">@User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value</span></p>
+                        <a asp-controller="Claims" asp-action="Dashboard" class="btn btn-primary btn-lg mt-3">
+                            <i class="fas fa-tachometer-alt me-2"></i>Go to Dashboard
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    <div class="mt-5">
+                        <h4>Get Started</h4>
+                        <p class="text-muted">Please log in to access the claim system</p>
+                        <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-primary btn-lg mt-3">
+                            <i class="fas fa-sign-in-alt me-2"></i>Login to System
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hero-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 3rem;
+        border-radius: 15px;
+        color: white;
+        margin-bottom: 2rem;
+    }
+
+    .card {
+        transition: transform 0.3s ease;
+        border: none;
+    }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+</style>
